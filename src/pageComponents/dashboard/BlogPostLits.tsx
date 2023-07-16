@@ -4,19 +4,19 @@ import { BlogPost } from "./BlogPost";
 
 import { supabase } from "@/utils/supabase";
 
-type BlogPost = {
-  id: string;
-  title: string;
-  description: string;
-  image_url: string;
-};
+import { BlogPostType } from "../../types/BlogPostType";
 
 export const BlogPostList = () => {
-  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [posts, setPosts] = useState<BlogPostType[]>([]);
 
   const fetchPosts = async () => {
-    const { data } = await supabase.from("blog_posts").select("*");
-    const posts = data as BlogPost[];
+    const { data, error } = await supabase.from("blog_posts").select("*");
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    const posts = data as BlogPostType[];
     setPosts(posts);
   };
 

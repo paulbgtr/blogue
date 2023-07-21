@@ -1,8 +1,33 @@
+import { useState, useEffect } from "react";
+import { useRouter } from "next/router";
 import Link from "next/link";
 
 import { Search } from "./Search";
 
+import { supabase } from "@/utils/supabase";
+import { isUserAuthenticated } from "@/utils/isUserAuthenticated";
+
 export const Navbar = () => {
+  const [userRole, setUserRole] = useState<string | null>(null);
+  const router = useRouter();
+
+  const handleUserRole = async () => {
+    const userRole = await isUserAuthenticated();
+    userRole && setUserRole("authenticated");
+  };
+
+  const handleSignOut = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      throw new Error(error.message);
+    }
+    router.push("/login");
+  };
+
+  useEffect(() => {
+    handleUserRole();
+  }, []);
+
   return (
     <div className="shadow-lg navbar bg-base-100">
       <div className="navbar-start">
@@ -40,23 +65,34 @@ export const Navbar = () => {
               <img src="/images/stock/photo-1534528741775-53994a69daeb.jpg" />
             </div>
           </label>
-          <ul
-            tabIndex={0}
-            className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52"
-          >
-            <li>
-              <a className="justify-between">
-                Profile
-                <span className="badge">New</span>
-              </a>
-            </li>
-            <li>
-              <a>Settings</a>
-            </li>
-            <li>
-              <a>Logout</a>
-            </li>
-          </ul>
+          {userRole === "authenticated" ? (
+            <ul
+              tabIndex={0}
+              className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52"
+            >
+              <li>
+                <a className="justify-between">
+                  Profile
+                  <span className="badge">New</span>
+                </a>
+              </li>
+              <li>
+                <a>Settings</a>
+              </li>
+              <li>
+                <button onClick={handleSignOut}>Logout</button>
+              </li>
+            </ul>
+          ) : (
+            <ul
+              tabIndex={0}
+              className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52"
+            >
+              <li>
+                <Link href="/login">Sign In</Link>
+              </li>
+            </ul>
+          )}
         </div>
       </div>
     </div>

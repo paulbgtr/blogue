@@ -86,7 +86,7 @@ const Login = () => {
             </form>
             <p>
               New to blogue?{" "}
-              <Link className="link" href="/sign_up">
+              <Link className="link" href="/signup">
                 Create an account
               </Link>
               !
